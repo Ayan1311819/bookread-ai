@@ -28,7 +28,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Extract text from a PDF page
+
 async function extractPageText(pdfPath, pageNum) {
   const data = new Uint8Array(fs.readFileSync(pdfPath));
   const pdf = await pdfjsLib.getDocument({ data }).promise;
@@ -64,7 +64,7 @@ app.post('/api/query', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': 'AIzaSyC49esnNs_z6K9ln32bfHDQc9puFFzBfsk',
+          'x-goog-api-key': '',
         },
       }
     );
