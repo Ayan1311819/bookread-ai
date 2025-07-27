@@ -10,7 +10,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5173'] }));
 
 // Multer config
 const storage = multer.diskStorage({
@@ -27,16 +27,6 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
-async function extractPageText(pdfPath, pageNum) {
-  const data = new Uint8Array(fs.readFileSync(pdfPath));
-  const pdf = await pdfjsLib.getDocument({ data }).promise;
-  const page = await pdf.getPage(pageNum);
-  const content = await page.getTextContent();
-  const strings = content.items.map((item) => item.str);
-  return strings.join(' ');
-}
 
 app.post('/api/query', async (req, res) => {
   const { text, prompt, filename, pageNumber } = req.body;
@@ -64,7 +54,7 @@ app.post('/api/query', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': '',
+          'x-goog-api-key': process.env.GEMINI_API_KEY,
         },
       }
     );
