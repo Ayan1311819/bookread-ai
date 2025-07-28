@@ -1,16 +1,24 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const path = require('path');
-const { extractContextFromPDF } = require('./pdfUtils');
-const axios = require('axios');
-const fs = require('fs');
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { extractContextFromPDF } from './pdfUtils.js';
+import axios from 'axios';
+import fs from 'fs';
+import dotenv from 'dotenv';
 
-require('dotenv').config();
+dotenv.config();
 
-const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();  
+app.use(cors());
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(express.json());
-app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5173'] }));
 
 // Multer config
 const storage = multer.diskStorage({
@@ -27,6 +35,16 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+async function extractPageText(pdfPath, pageNum) {
+  const data = new Uint8Array(fs.readFileSync(pdfPath));
+  const pdf = await pdfjsLib.getDocument({ data }).promise;
+  const page = await pdf.getPage(pageNum);
+  const content = await page.getTextContent();
+  const strings = content.items.map((item) => item.str);
+  return strings.join(' ');
+}
 
 app.post('/api/query', async (req, res) => {
   const { text, prompt, filename, pageNumber } = req.body;
@@ -54,7 +72,7 @@ app.post('/api/query', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': process.env.GEMINI_API_KEY,
+          'x-goog-api-key': '',
         },
       }
     );
@@ -68,7 +86,6 @@ app.post('/api/query', async (req, res) => {
     res.status(500).json({ error: 'Failed to query Gemini API' });
   }
 });
-
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
