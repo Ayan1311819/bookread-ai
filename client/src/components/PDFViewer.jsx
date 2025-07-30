@@ -3,8 +3,6 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Use CDN - most reliable approach
-// Use matching version from the same source
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs'; 
 
 function PDFViewer({ fileData, onGoHome }) {
@@ -89,7 +87,7 @@ function PDFViewer({ fileData, onGoHome }) {
     setCurrentQuery('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/query', {
+      const response = await fetch('http://13.232.81.182:5000/api/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

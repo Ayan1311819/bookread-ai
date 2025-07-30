@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 function HomePage({ onFileUpload }) {
   const [isUploading, setIsUploading] = useState(false);
-
+ 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -12,7 +12,7 @@ function HomePage({ onFileUpload }) {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/upload', {
+      const response = await fetch('http://13.232.81.182:5000/api/upload', {
         method: 'POST',
         body: formData,
       });
@@ -20,7 +20,7 @@ function HomePage({ onFileUpload }) {
 
       // Pass file info to parent component
       onFileUpload({
-        fileUrl: `http://localhost:5000${data.filePath}`,
+        fileUrl: `http://13.232.81.182:5000${data.filePath}`,
         originalName: file.name,
         uploadedFilename: data.filePath.split('/').pop(),
       });
